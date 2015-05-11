@@ -3,8 +3,8 @@
 
 var Xpl = require("xpl-api");
 var commander = require('commander');
-//var serialport = require("serialport");
-//var TSX17 = require('tsx17');
+var serialport = require("serialport");
+var TSX17 = require('tsx17');
 var os = require('os');
 
 var processor;
