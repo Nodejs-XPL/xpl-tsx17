@@ -1,0 +1,26 @@
+{
+  "name": "xpl-tsx17",
+  "version": "1.0.0",
+  "description": "XPL bridge for Telemecanique TX17",
+  "bin": {
+  	"xpl-tsx17": "./bin/xpl-tsx17"
+  },
+  "repository": { "type": "git", "url": "https://github.com/oeuillot/xpl-tsx17.git" },
+  "dependencies": {
+	  "xpl-api": "~1.0.12",
+	  "tsx17": "latest",
+	  "commander": "~2.3",
+	  "jsep": "latest"
+  },
+  "keywords": [
+    "XPL",
+    "TSX", "TSX17", "telemecanique"
+  ],
+  "files": [
+    "xpl-tsx17.js",
+    "bin/xpl-tsx17"
+	],
+  "author": "Olivier Oeuillot",
+  "license": "GPL",
+  "readmeFilename": "README.md"
+}
