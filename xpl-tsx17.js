@@ -82,7 +82,7 @@ commander.command('start').description("Start processing TSX17 datas").action(fu
 		console.log("Use default serial port : " + commander.serialPort);
 	}
 
-	var tsx = new TSX.Serial(commander.serialPort, function(error, tsx) {
+	var tsx = new TSX17.Serial(commander.serialPort, function(error, tsx) {
 		if (error) {
 			console.log("Can not instanciate tsx ", error);
 			process.exit(1);
@@ -100,7 +100,7 @@ commander.command('start').description("Start processing TSX17 datas").action(fu
 
 			console.log("Serial device '" + commander.serialPort + "' opened.");
 
-			var protocol = new TSX.Protocol(tsx);
+			var protocol = new TSX17.Protocol(tsx);
 
 			if (!commander.xplSource) {
 				var hostName = os.hostname();
