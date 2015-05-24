@@ -10,7 +10,8 @@
 	  "xpl-api": "~1.0.12",
 	  "serialport": "latest",
 	  "commander": "~2.3",
-	  "jsep": "latest"
+	  "jsep": "latest",
+	  "debug": "latest"
   },
   "keywords": [
     "XPL",

@@ -137,9 +137,10 @@ commander.command('start').description("Start processing TSX17 datas").action(fu
 				if (!processorClass) {
 					processorClass = require('./lib/words');
 				}
-				var processor = new processorClass(commander, tsx, xpl, model);
 
 				var wordsToChange = [];
+
+				var processor = new processorClass(commander, tsx, xpl, model, wordsToChange);
 
 				var previousWords = null;
 
