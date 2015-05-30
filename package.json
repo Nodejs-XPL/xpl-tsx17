@@ -11,7 +11,8 @@
 	  "serialport": "latest",
 	  "commander": "~2.3",
 	  "jsep": "latest",
-	  "debug": "latest"
+	  "debug": "latest",
+	  "async": "latest"
   },
   "keywords": [
     "XPL",
