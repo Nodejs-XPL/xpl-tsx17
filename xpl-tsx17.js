@@ -157,10 +157,10 @@ commander.command('start').description("Start processing TSX17 datas").action(fu
 								return;
 							}
 
+							var diff = null;
 							if (previousWords) {
 								var len = Math.min(previousWords.length, words.length);
 
-								var diff;
 								for (var i = 0; i < len; i++) {
 									if (words[i] === previousWords[i]) {
 										continue;
@@ -175,14 +175,9 @@ commander.command('start').description("Start processing TSX17 datas").action(fu
 										value: words[i]
 									});
 								}
-
-								if (diff) {
-									processor.wordsChanged(diff);
-								}
-
-							} else {
-								processor.initWords(words);
 							}
+
+							processor.emit('words', words, diff);
 
 							previousWords = words;
 
