@@ -6,6 +6,7 @@ var commander = require('commander');
 var serialport = require("serialport");
 var TSX17 = require('tsx17');
 var os = require('os');
+var debug = require('debug')('xpl-tsx17:model');
 
 var processor;
 
@@ -169,7 +170,7 @@ commander.command('start').description("Start processing TSX17 datas").action(fu
 									if (words[i] === previousWords[i]) {
 										continue;
 									}
-									console.log("Word changed: index=", i, "value=", words[i]);
+									debug("Word changed: index=", i, "value=", words[i]);
 
 									if (!diff) {
 										diff = [];
@@ -180,6 +181,8 @@ commander.command('start').description("Start processing TSX17 datas").action(fu
 									});
 								}
 							}
+
+							debug("Emit words event", words, diff);
 
 							processor.emit('words', words, diff);
 
