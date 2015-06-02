@@ -40,6 +40,12 @@ commander.command('listSerialPort').description("List serial ports").action(
 
 function changeWords(protocol, ws, callback) {
 
+	if (!ws.length) {
+		return callback();
+	}
+
+	debug("Changed words=", ws);
+
 	var start = 0;
 	for (; start < ws.length && ws[start] === undefined; start++) {
 	}
