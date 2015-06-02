@@ -54,6 +54,8 @@ function changeWords(protocol, ws, callback) {
 		var v = ws[start];
 		delete ws[start];
 
+		debug("SetWord offset=", start, " value=", v, " ws=", ws);
+
 		protocol.setWord(v, start, callback);
 		return;
 	}
@@ -62,6 +64,8 @@ function changeWords(protocol, ws, callback) {
 	for (var i = start; i < end; i++) {
 		delete ws[i];
 	}
+
+	debug("SetWords offset=", start, " values=", nv, " ws=", ws);
 
 	protocol.setWords(nv, start, nv.length, callback);
 }
