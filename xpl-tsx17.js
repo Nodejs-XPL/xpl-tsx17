@@ -6,7 +6,7 @@ var commander = require('commander');
 var serialport = require("serialport");
 var TSX17 = require('tsx17');
 var os = require('os');
-var debug = require('debug')('xpl-tsx17:model');
+var debug = require('debug')('xpl-tsx17');
 
 var processor;
 
