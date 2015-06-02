@@ -57,7 +57,7 @@ function changeWords(protocol, ws, callback) {
 		return callback();
 	}
 
-	if (start === end + 1) {
+	if (start === end - 1) {
 		var v = ws[start];
 		delete ws[start];
 
