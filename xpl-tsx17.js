@@ -190,7 +190,7 @@ commander.command('start').description("Start processing TSX17 datas").action(fu
 
 							debug("Emit words event", words, diff);
 
-							processor.emit('words', words, diff);
+							processor.emit('words', words, diff, previousWords);
 
 							previousWords = words;
 
