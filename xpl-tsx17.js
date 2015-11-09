@@ -218,7 +218,7 @@ commander.command('test').action(function() {
 
 commander.parse(process.argv);
 
-if (commander.headDump) {
+if (commander.heapDump) {
 	var heapdump = require("heapdump");
 	console.log("***** HEAPDUMP enabled **************");
 }
