@@ -7,12 +7,13 @@
   },
   "repository": { "type": "git", "url": "https://github.com/oeuillot/xpl-tsx17.git" },
   "dependencies": {
-	  "xpl-api": "~1.0.12",
+	  "xpl-api": "latest",
 	  "serialport": "latest",
 	  "commander": "~2.3",
 	  "jsep": "latest",
 	  "debug": "latest",
-	  "async": "latest"
+	  "async": "latest",
+	  "node-tsx17": "latest"
   },
   "keywords": [
     "XPL",

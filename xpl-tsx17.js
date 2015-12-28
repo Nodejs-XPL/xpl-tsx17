@@ -20,205 +20,235 @@ Xpl.fillCommander(commander);
 commander.option("--heapDump", "Enable heap dump (require heapdump)");
 
 commander.command('listSerialPort').description("List serial ports").action(
-		function() {
+    function() {
 
-			console.log("List serial ports:");
-			serialport.list(function(err, ports) {
-				if (err) {
-					console.log("List performs error : " + err);
-					process.exit(0);
-					return;
-				}
+      console.log("List serial ports:");
+      serialport.list(function(err, ports) {
+        if (err) {
+          console.log("List performs error : " + err);
+          process.exit(0);
+          return;
+        }
 
-				ports.forEach(function(port) {
-					console.log("  Port name='" + port.comName + "' pnpId='" + port.pnpId + "' manufacturer='" +
-							port.manufacturer + "'");
-				});
-				console.log("End of list");
-			});
-		});
+        ports.forEach(function(port) {
+          console.log("  Port name='" + port.comName + "' pnpId='" +
+              port.pnpId + "' manufacturer='" + port.manufacturer + "'");
+        });
+        console.log("End of list");
+      });
+    });
 
 function changeWords(protocol, ws, callback) {
 
-	if (!ws.length) {
-		return callback();
-	}
+  if (!ws.length) {
+    return callback();
+  }
 
-	debug("Changed words=", ws);
+  debug("Changed words=", ws);
 
-	var start = 0;
-	for (; start < ws.length && ws[start] === undefined; start++) {
-	}
-	var end = start;
-	for (; end < ws.length && ws[end] !== undefined; end++) {
-	}
+  var start = 0;
+  for (; start < ws.length && ws[start] === undefined; start++) {
+  }
+  var end = start;
+  for (; end < ws.length && ws[end] !== undefined; end++) {
+  }
 
-	if (start === end) {
-		return callback();
-	}
+  if (start === end) {
+    return callback();
+  }
 
-	if (start === end - 1) {
-		var v = ws[start];
-		delete ws[start];
+  if (start === end - 1) {
+    var v = ws[start];
+    delete ws[start];
 
-		debug("SetWord offset=", start, " value=", v, " ws=", ws);
+    debug("SetWord offset=", start, " value=", v, " ws=", ws);
 
-		protocol.setWord(v, start, callback);
-		return;
-	}
+    protocol.setWord(v, start, callback);
+    return;
+  }
 
-	var nv = ws.slice(start, end);
-	for (var i = start; i < end; i++) {
-		delete ws[i];
-	}
+  var nv = ws.slice(start, end);
+  for (var i = start; i < end; i++) {
+    delete ws[i];
+  }
 
-	debug("SetWords offset=", start, " values=", nv, " ws=", ws);
+  debug("SetWords offset=", start, " values=", nv, " ws=", ws);
 
-	protocol.setWords(nv, start, nv.length, callback);
+  protocol.setWords(nv, start, nv.length, callback);
 }
 
-commander.command('start').description("Start processing TSX17 datas").action(function() {
-	console.log("Start");
+commander
+    .command('start')
+    .description("Start processing TSX17 datas")
+    .action(
+        function() {
+          console.log("Start");
 
-	if (!commander.serialPort) {
-		switch (os.platform()) {
-		case "win32":
-			commander.serialPort = "COM4";
-			break;
-		case "linux":
-			commander.serialPort = "/dev/serial/by-path/pci-0000:00:14.0-usb-0:1:1.0-port0";
-			break;
-		}
+          if (!commander.serialPort) {
+            switch (os.platform()) {
+            case "win32":
+              commander.serialPort = "COM4";
+              break;
+            case "linux":
+              commander.serialPort = "/dev/serial/by-path/pci-0000:00:14.0-usb-0:1:1.0-port0";
+              break;
+            }
 
-		console.log("Use default serial port : " + commander.serialPort);
-	}
+            console.log("Use default serial port : " + commander.serialPort);
+          }
 
-	var tsx = new TSX17.Serial(commander.serialPort, function(error, tsx) {
-		if (error) {
-			console.log("Can not instanciate tsx ", error);
-			process.exit(1);
-			return;
-		}
+          var lastWordsDate = -1;
+          var lastWatchdogDate = -1;
+          setInterval(function() {
+            if (lastWatchdogDate < 0) {
+              lastWatchdogDate = watchdogDate;
+              return
+            }
+            var now = Date.now();
+            if (lastWatchdogDate < lastWordsDate) {
+              lastWatchdogDate = now;
+              return;
+            }
+            console.error("Watchdog detection ! no data");
+            process.exit(1);
 
-		console.log("Before open");
+          }, 1000 * 30);
 
-		tsx.open(function(error) {
-			if (error) {
-				console.log("Can not open tsx ", error);
-				process.exit(1);
-				return;
-			}
+          var tsx = new TSX17.Serial(commander.serialPort,
+              function(error, tsx) {
+                if (error) {
+                  console.log("Can not instanciate tsx ", error);
+                  process.exit(1);
+                  return;
+                }
 
-			console.log("Serial device '" + commander.serialPort + "' opened.");
+                console.log("Before open");
 
-			var protocol = new TSX17.Protocol(tsx);
+                tsx.open(function(error) {
+                  if (error) {
+                    console.log("Can not open tsx ", error);
+                    process.exit(1);
+                    return;
+                  }
 
-			if (!commander.xplSource) {
-				var hostName = os.hostname();
-				if (hostName.indexOf('.') > 0) {
-					hostName = hostName.substring(0, hostName.indexOf('.'));
-				}
+                  console.log("Serial device '" + commander.serialPort +
+                      "' opened.");
 
-				commander.xplSource = "tsx17." + hostName;
-			}
+                  var protocol = new TSX17.Protocol(tsx);
 
-			var xpl = new Xpl(commander);
+                  if (!commander.xplSource) {
+                    var hostName = os.hostname();
+                    if (hostName.indexOf('.') > 0) {
+                      hostName = hostName.substring(0, hostName.indexOf('.'));
+                    }
 
-			xpl.on("error", function(error) {
-				console.log("XPL error", error);
-			});
+                    commander.xplSource = "tsx17." + hostName;
+                  }
 
-			xpl.bind(function(error) {
-				if (error) {
-					console.log("Can not open xpl bridge ", error);
-					process.exit(2);
-					return;
-				}
+                  var xpl = new Xpl(commander);
 
-				console.log("Xpl bind succeed ");
+                  xpl.on("error", function(error) {
+                    console.log("XPL error", error);
+                  });
 
-				var processorClass;
-				var model;
-				if (commander.model) {
-					model = require(commander.model);
+                  xpl.bind(function(error) {
+                    if (error) {
+                      console.log("Can not open xpl bridge ", error);
+                      process.exit(2);
+                      return;
+                    }
 
-					processorClass = require('./lib/model');
-				}
+                    console.log("Xpl bind succeed ");
 
-				if (!processorClass) {
-					processorClass = require('./lib/words');
-				}
+                    var processorClass;
+                    var model;
+                    if (commander.model) {
+                      model = require(commander.model);
 
-				var wordsToChange = [];
+                      processorClass = require('./lib/model');
+                    }
 
-				var processor = new processorClass(commander, tsx, xpl, model, wordsToChange);
+                    if (!processorClass) {
+                      processorClass = require('./lib/words');
+                    }
 
-				var previousWords = null;
+                    var wordsToChange = [];
 
-				function poolWords() {
+                    var processor = new processorClass(commander, tsx, xpl,
+                        model, wordsToChange);
 
-					changeWords(protocol, wordsToChange, function(error) {
-						if (error) {
-							console.error(error);
-						}
+                    var previousWords = null;
 
-						protocol.readWords(0, commander.wordCount || 15, function(error, words) {
-							if (error) {
-								console.error(error);
-								return;
-							}
+                    function poolWords() {
 
-							var diff = null;
-							if (previousWords) {
-								var len = Math.min(previousWords.length, words.length);
+                      changeWords(protocol, wordsToChange, function(error) {
+                        if (error) {
+                          console.error(error);
+                        }
 
-								for (var i = 0; i < len; i++) {
-									if (words[i] === previousWords[i]) {
-										continue;
-									}
-									debug("Word changed: index=", i, "value=", words[i]);
+                        protocol.readWords(0, commander.wordCount || 15,
+                            function(error, words) {
+                              if (error) {
+                                console.error(error);
+                                return;
+                              }
 
-									if (!diff) {
-										diff = [];
-									}
-									diff.push({
-										index: i,
-										value: words[i]
-									});
-								}
-							}
+                              lastWordsDate = Date.now();
 
-							debug("Emit words event", words, diff);
+                              var diff = null;
+                              if (previousWords) {
+                                var len = Math.min(previousWords.length,
+                                    words.length);
 
-							processor.emit('words', words, diff, previousWords);
+                                for (var i = 0; i < len; i++) {
+                                  if (words[i] === previousWords[i]) {
+                                    continue;
+                                  }
+                                  debug("Word changed: index=", i, "value=",
+                                      words[i]);
 
-							previousWords = words;
+                                  if (!diff) {
+                                    diff = [];
+                                  }
+                                  diff.push({
+                                    index : i,
+                                    value : words[i]
+                                  });
+                                }
+                              }
 
-							setTimeout(poolWords, 10);
-						});
-					});
-				}
+                              debug("Emit words event", words, diff);
 
-				poolWords();
-			});
-		});
-	});
-});
+                              processor.emit('words', words, diff,
+                                  previousWords);
+
+                              previousWords = words;
+
+                              setTimeout(poolWords, 10);
+                            });
+                      });
+                    }
+
+                    poolWords();
+                  });
+                });
+              });
+        });
 
 commander.command('test').action(function() {
-	var model = require(commander.model);
+  var model = require(commander.model);
 
-	var processorClass = require('./lib/model');
-	var tsx = null;
-	var xpl = null;
+  var processorClass = require('./lib/model');
+  var tsx = null;
+  var xpl = null;
 
-	var processor = new processorClass(commander, tsx, xpl, model);
+  var processor = new processorClass(commander, tsx, xpl, model);
 
 });
 
 commander.parse(process.argv);
 
 if (commander.heapDump) {
-	var heapdump = require("heapdump");
-	console.log("***** HEAPDUMP enabled **************");
+  var heapdump = require("heapdump");
+  console.log("***** HEAPDUMP enabled **************");
 }
