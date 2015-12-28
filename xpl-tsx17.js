@@ -101,7 +101,7 @@ commander
           var lastWatchdogDate = -1;
           setInterval(function() {
             if (lastWatchdogDate < 0) {
-              lastWatchdogDate = watchdogDate;
+              lastWatchdogDate = lastWordsDate;
               return
             }
             var now = Date.now();
