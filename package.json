@@ -1,6 +1,6 @@
 {
   "name": "xpl-tsx17",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "XPL bridge for Telemecanique TX17",
   "bin": {
   	"xpl-tsx17": "./bin/xpl-tsx17"
