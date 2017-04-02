@@ -13,7 +13,7 @@
 	  "jsep": "latest",
 	  "debug": "latest",
 	  "async": "latest",
-	  "node-tsx17": "latest"
+	  "tsx17": "latest"
   },
   "keywords": [
     "XPL",
