@@ -141,7 +141,7 @@ commander.command('start').description("Start processing TSX17 datas").action(()
 			var xpl = new Xpl(commander);
 
 			xpl.on("error", (error) => {
-				console.log("XPL error", error);
+				console.error("XPL error", error);
 			});
 
 			xpl.bind((error) => {
@@ -201,6 +201,7 @@ commander.command('start').description("Start processing TSX17 datas").action(()
 									}
 									diff.push({
 										index: i,
+										trig: (previousWords[i] !== undefined),
 										value: words[i]
 									});
 								}
