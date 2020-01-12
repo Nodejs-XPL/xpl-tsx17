@@ -3,7 +3,7 @@
 
 var Xpl = require("xpl-api");
 var commander = require('commander');
-var serialport = require("serialport");
+var Serialport = require("serialport");
 var TSX17 = require('tsx17');
 var os = require('os');
 var debug = require('debug')('xpl-tsx17');
@@ -237,6 +237,6 @@ commander.command('test').action(() => {
 commander.parse(process.argv);
 
 if (commander.heapDump) {
-	var heapdump = require("heapdump");
+//	var heapdump = require("heapdump");
 	console.log("***** HEAPDUMP enabled **************");
 }
